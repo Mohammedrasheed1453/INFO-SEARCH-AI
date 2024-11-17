@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import io
 
 # ScraperAPI configuration
-SCRAPER_API_KEY = "3c1a309cb057b2ca85477dd720fec1e6"  # Replace with your ScraperAPI key
+SCRAPER_API_KEY = "####################"  # Replace with your ScraperAPI key
 
 # Function to perform search using ScraperAPI
 def search_scraperapi(query):
