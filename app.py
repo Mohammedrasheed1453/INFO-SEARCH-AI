@@ -3,11 +3,14 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import io
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # ScraperAPI configuration
-SCRAPER_API_KEY = "####################"  # Replace with your ScraperAPI key
+SCRAPER_API_KEY = "###############"  # Replace with your ScraperAPI key
 
 # Function to perform search using ScraperAPI
+@st.cache_data
 def search_scraperapi(query):
     url_to_scrape = f"https://www.google.com/search?q={query}"
     scraperapi_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={url_to_scrape}"
@@ -55,7 +58,49 @@ if not data.empty:
 
     if selected_column:
         st.subheader("Enter Your Query")
-        user_query = st.text_input("Enter your query (e.g., 'What is BMI?' or 'average BMI for males'):")
+        user_query = st.text_input("Enter your query (e.g., 'What is BMI?' or 'average BMI for males'): ")
+
+        # Visualization options
+        st.subheader("Data Visualization")
+        visualize_option = st.selectbox("Choose a visualization type:", ["None", "Histogram", "Boxplot", "Scatterplot", "Correlation Heatmap", "Pie chart", "Line chart"])
+
+        if visualize_option == "Histogram":
+            column = st.selectbox("Select column for histogram:", data.columns)
+            if column:
+                fig, ax = plt.subplots()
+                sns.histplot(data[column], kde=True, ax=ax)
+                st.pyplot(fig)
+        elif visualize_option == "Boxplot":
+            column = st.selectbox("Select column for boxplot:", data.columns)
+            if column:
+                fig, ax = plt.subplots()
+                sns.boxplot(x=data[column], ax=ax)
+                st.pyplot(fig)
+        elif visualize_option == "Scatterplot":
+            x_column = st.selectbox("Select X-axis column for scatterplot:", data.columns)
+            y_column = st.selectbox("Select Y-axis column for scatterplot:", data.columns)
+            if x_column and y_column:
+                fig, ax = plt.subplots()
+                sns.scatterplot(x=data[x_column], y=data[y_column], ax=ax)
+                st.pyplot(fig)
+        elif visualize_option == "Pie chart":
+            column = st.selectbox("Select categorical column for pie chart:", data.columns)
+            if column:
+                fig, ax = plt.subplots()
+                data[column].value_counts().plot(kind='pie', ax=ax, autopct='%1.1f%%', startangle=90)
+                ax.set_ylabel('')
+                st.pyplot(fig)
+        elif visualize_option == "Line chart":
+            column = st.selectbox("Select column for line chart:", data.columns)
+            if column:
+                fig, ax = plt.subplots()
+                data[column].plot(kind='line', ax=ax)
+                st.pyplot(fig)
+        elif visualize_option == "Correlation Heatmap":
+            if not data.empty:
+                fig, ax = plt.subplots(figsize=(10, 6))
+                sns.heatmap(data.corr(), annot=True, cmap="coolwarm", ax=ax)
+                st.pyplot(fig)
 
         if user_query:
             st.write(f"Processing query: {user_query}")
